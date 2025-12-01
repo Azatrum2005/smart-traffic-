@@ -386,7 +386,7 @@ export GEMINI_API_KEY=your_key
 
 ## 📄 License
 
-Open source - available for educational and commercial use.
+Open source 
 
 ## 🤝 Contributing
 
@@ -395,14 +395,6 @@ Contributions welcome! Feel free to:
 - Improve AI prompts
 - Add new traffic providers
 - Enhance UI/UX
-
-## 📞 Support
-
-For issues:
-1. Check this README
-2. Review browser console for errors
-3. Verify API keys and rate limits
-4. Check server logs
 
 ## 🎉 Credits
 
@@ -415,5 +407,3 @@ For issues:
 - **Esri** - Satellite imagery
 
 ---
-
-**Made with ❤️ for smarter cities and safer roads**
