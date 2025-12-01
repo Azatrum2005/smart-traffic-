@@ -1,0 +1,14 @@
+/Users/purvashah/Desktop/smart-trafficx/src/main/java/com/trafficx/SmartTrafficXApplication.java
+/Users/purvashah/Desktop/smart-trafficx/src/main/java/com/trafficx/config/WebSocketConfig.java
+/Users/purvashah/Desktop/smart-trafficx/src/main/java/com/trafficx/controller/DashboardController.java
+/Users/purvashah/Desktop/smart-trafficx/src/main/java/com/trafficx/controller/RouteController.java
+/Users/purvashah/Desktop/smart-trafficx/src/main/java/com/trafficx/model/Incident.java
+/Users/purvashah/Desktop/smart-trafficx/src/main/java/com/trafficx/model/Road.java
+/Users/purvashah/Desktop/smart-trafficx/src/main/java/com/trafficx/model/SensorData.java
+/Users/purvashah/Desktop/smart-trafficx/src/main/java/com/trafficx/model/TrafficEntity.java
+/Users/purvashah/Desktop/smart-trafficx/src/main/java/com/trafficx/model/TrafficLight.java
+/Users/purvashah/Desktop/smart-trafficx/src/main/java/com/trafficx/repository/IncidentRepository.java
+/Users/purvashah/Desktop/smart-trafficx/src/main/java/com/trafficx/repository/RoadRepository.java
+/Users/purvashah/Desktop/smart-trafficx/src/main/java/com/trafficx/service/RoutingService.java
+/Users/purvashah/Desktop/smart-trafficx/src/main/java/com/trafficx/service/TrafficManagerService.java
+/Users/purvashah/Desktop/smart-trafficx/src/main/java/com/trafficx/util/Dijkstra.java

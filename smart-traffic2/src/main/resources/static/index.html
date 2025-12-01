@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Global Traffic Intelligence System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background: #0a0e27;
+        }
+
+        #sidebar {
+            width: 420px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #sidebar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+        }
+
+        #sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 25px;
+        }
+
+        .section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.95);
+            color: #1e3c72;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 8px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-ai {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        #map {
+            flex: 1;
+            position: relative;
+        }
+
+        .info-box {
+            background: rgba(255,255,255,0.15);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 13px;
+            line-height: 1.6;
+            min-height: 60px;
+        }
+
+        .incident-item {
+            background: rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border-left: 3px solid #f5576c;
+        }
+
+        .incident-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .incident-detail {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 3px;
+        }
+
+        .incident-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
+        /* Chat Interface */
+        #chatContainer {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            height: 350px;
+        }
+
+        #chatMessages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 12px;
+            padding-right: 8px;
+        }
+
+        #chatMessages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #chatMessages::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+        }
+
+        .chat-message {
+            margin-bottom: 12px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-message.user {
+            text-align: right;
+        }
+
+        .chat-bubble {
+            display: inline-block;
+            padding: 10px 14px;
+            border-radius: 12px;
+            max-width: 85%;
+            word-wrap: break-word;
+        }
+
+        .chat-message.user .chat-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            text-align: left;
+        }
+
+        .chat-message.ai .chat-bubble {
+            background: rgba(255,255,255,0.2);
+            text-align: left;
+        }
+
+        #chatInputContainer {
+            display: flex;
+            gap: 8px;
+        }
+
+        #chatInput {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        #sendChatBtn {
+            width: auto;
+            padding: 12px 20px;
+            margin-bottom: 0;
+        }
+
+        .layer-control {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+        }
+
+        .layer-control label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .layer-control input[type="radio"] {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        .emoji {
+            font-size: 18px;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            opacity: 0.8;
+        }
+
+        .stat-value {
+            font-weight: 600;
+        }
+
+        .route-info {
+            background: rgba(255,255,255,0.15);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .route-warning {
+            background: rgba(255, 193, 7, 0.2);
+            border-left: 3px solid #ffc107;
+            padding: 10px;
+            margin-top: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .route-success {
+            background: rgba(76, 175, 80, 0.2);
+            border-left: 3px solid #4caf50;
+            padding: 10px;
+            margin-top: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .congestion-marker {
+            background: rgba(255, 87, 34, 0.8);
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .search-marker {
+            background: #4facfe;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="sidebar">
+        <h1>🌍 Global Traffic Intelligence</h1>
+        <p class="subtitle">Real-time traffic monitoring & AI-powered assistance</p>
+
+        <!-- City Selection -->
+        <div class="section">
+            <div class="section-title"><span class="emoji">🏙️</span> Select City</div>
+            <select id="citySelect" onchange="changeCity()">
+                <option value="">Choose a city...</option>
+            </select>
+        </div>
+
+        <!-- Location Search -->
+        <div class="section">
+            <div class="section-title"><span class="emoji">🔍</span> Search Location</div>
+            <input id="locationSearch" type="text" placeholder="Search address or landmark...">
+            <button onclick="searchLocation()">📍 Find Location</button>
+        </div>
+
+        <!-- AI Chat Assistant -->
+        <div id="chatContainer">
+            <div class="section-title"><span class="emoji">🤖</span> AI Traffic Assistant</div>
+            <div id="chatMessages"></div>
+            <div id="chatInputContainer">
+                <input id="chatInput" type="text" placeholder="Ask about traffic, routes, or conditions..." 
+                       onkeypress="if(event.key==='Enter') sendChatMessage()">
+                <button id="sendChatBtn" onclick="sendChatMessage()">Send</button>
+            </div>
+        </div>
+
+        <!-- Route Planning -->
+        <div class="section">
+            <div class="section-title"><span class="emoji">🗺️</span> Route Planning</div>
+            <input id="startLocation" type="text" placeholder="Start location (or click map)">
+            <input id="endLocation" type="text" placeholder="End location (or click map)">
+            <div class="checkbox-container">
+                <input type="checkbox" id="avoidTraffic" checked>
+                <label for="avoidTraffic">Avoid heavy traffic</label>
+            </div>
+            <button onclick="calculateRoute()">🔍 Calculate Optimal Route</button>
+            <button class="btn-secondary" onclick="clearRoute()">🗑️ Clear Route</button>
+            <div id="routeInfo"></div>
+        </div>
+
+        <!-- Traffic Stats -->
+        <div class="section">
+            <div class="section-title"><span class="emoji">📊</span> Traffic Statistics</div>
+            <div id="trafficStats" class="info-box">
+                <div class="stat">
+                    <span class="stat-label">Active Incidents:</span>
+                    <span class="stat-value" id="incidentCount">-</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Avg. Speed:</span>
+                    <span class="stat-value" id="avgSpeed">-</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Congestion Level:</span>
+                    <span class="stat-value" id="congestionLevel">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Incidents -->
+        <div class="section">
+            <div class="section-title"><span class="emoji">⚠️</span> Active Incidents</div>
+            <div id="incidentsList" class="info-box">No incidents to display</div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <div class="layer-control">
+        <strong style="display: block; margin-bottom: 10px;">Map Style</strong>
+        <label>
+            <input type="radio" name="mapLayer" value="streets" checked> Streets
+        </label>
+        <label>
+            <input type="radio" name="mapLayer" value="satellite"> Satellite
+        </label>
+        <label>
+            <input type="radio" name="mapLayer" value="hybrid"> Hybrid
+        </label>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

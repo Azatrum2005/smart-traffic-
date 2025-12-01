@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "openrouteservice.api.key",
+    "type": "java.lang.String",
+    "description": "A description for 'openrouteservice.api.key'"
+  },
+  {
+    "name": "gemini.api.key",
+    "type": "java.lang.String",
+    "description": "A description for 'gemini.api.key'"
+  },
+  {
+    "name": "tomtom.api.key",
+    "type": "java.lang.String",
+    "description": "A description for 'tomtom.api.key'"
+  }
+]}
